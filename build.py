@@ -44,8 +44,8 @@ BIZ = {
     "name": "ProMan Painting & Wallpaper",
     "short": "ProMan",
     "owner": "Roman Ponomarenko",
-    # TODO: real number. Used for every tel: link and the schema.
-    "phone": "(864) 000-0000",
+    # Used for every tel: link, the header, the footer and the schema.
+    "phone": "(864) 205-5618",
     "email": "info@promanpainting.com",          # TODO: confirm
     "domain": "promanpainting.com",              # TODO: confirm / buy
     "street": "412 Thiago Ct",                   # not published — see SHOW_STREET
