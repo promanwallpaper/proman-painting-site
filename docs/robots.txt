@@ -1,4 +1,2 @@
 User-agent: *
-Allow: /
-
-Sitemap: https://promanpainting.com/sitemap.xml
+Disallow: /

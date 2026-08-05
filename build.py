@@ -46,8 +46,9 @@ BIZ = {
     "owner": "Roman Ponomarenko",
     # Used for every tel: link, the header, the footer and the schema.
     "phone": "(864) 205-5618",
-    "email": "info@promanpainting.com",          # TODO: confirm
-    "domain": "promanpainting.com",              # TODO: confirm / buy
+    # TODO: confirm the mailbox exists on the domain before launch.
+    "email": "info@paintingwallpapers.com",
+    "domain": "paintingwallpapers.com",          # confirmed by Roman, Aug 2026
     "street": "412 Thiago Ct",                   # not published — see SHOW_STREET
     "city": "Lyman",
     "state": "SC",
@@ -259,6 +260,12 @@ SERVICES = [
                  "full repaints and commercial wallcovering — scheduled so your business keeps "
                  "running.",
         "body": [
+            ("A Keller Williams office, done after hours",
+             "The private office in the photograph above is at a Keller Williams real estate "
+             "office here in the Upstate. The drywall had damage that had to be repaired and "
+             "skimmed flat before anything could go on it, and the geometric paper had to be "
+             "cut in around a window return and a wall-mounted TV. The work ran outside "
+             "business hours, and the agent came back to a finished room."),
             ("Around your hours, not ours",
              "Evenings, weekends and phased room-by-room work so the space stays usable. For "
              "most offices the practical answer is one room at a time after close, and the team "
@@ -503,7 +510,7 @@ FAQS = [
 GALLERY = [
     ("dining-after.jpg", "Dining room — botanical wallpaper over board-and-batten"),
     ("rose-after.jpg", "Bedroom — framed rose mural panel"),
-    ("office-after.jpg", "Commercial office — geometric feature wall"),
+    ("office-after.jpg", "Keller Williams office — geometric feature wall"),
     ("closet-watercolor.jpg", "Walk-in closet — watercolour and gold leaf, wall and ceiling"),
     ("powder-room.jpg", "Powder room — full wrap in patterned paper"),
     ("nursery-after.jpg", "Nursery — full-wall cloud mural"),
@@ -519,7 +526,7 @@ PAIRS = [
      "Board-and-batten panelling installed, then dark botanical paper hung above it."),
     ("rose-before.jpg", "rose-after.jpg", "Bedroom feature panel",
      "An empty molding surround turned into a framed rose mural, seams cut tight to the frame."),
-    ("office-before.jpg", "office-after.jpg", "Real estate office, Upstate SC",
+    ("office-before.jpg", "office-after.jpg", "Keller Williams office, Upstate SC",
      "Damaged drywall repaired and papered in a geometric print, cut in around the window and "
      "TV mount."),
     ("nursery-before.jpg", "nursery-after.jpg", "Nursery",
@@ -918,11 +925,11 @@ def page_home():
     hero = """<section class="hero">
       <div class="wrap hero__grid">
         <div>
-          <p class="eyebrow">Wallpaper &amp; painting · Greenville &amp; Spartanburg</p>
-          <h1>The Upstate's wallpaper specialists — and a painting company too</h1>
-          <p class="hero__sub">Most painters in the Upstate will quote your walls and pass on the
-             paper. We do both, and paper is what we are known for. %d five-star reviews across
-             Google and Thumbtack.</p>
+          <p class="eyebrow">Painting &amp; wallpaper · Greenville &amp; Spartanburg</p>
+          <h1>House painting and wallpaper across Greenville &amp; Spartanburg</h1>
+          <p class="hero__sub">Interiors, exteriors, cabinets and trim — and the wallpaper work
+             most painting companies in the Upstate quietly pass on. Both trades, one crew.
+             %d five-star reviews across Google and Thumbtack.</p>
           %s
           <div class="btn-row">
             <a class="btn btn--primary" href="/contact/">Get a free estimate</a>
@@ -934,8 +941,9 @@ def page_home():
     </section>""" % (PROOF["total_reviews"], rating_items(), PHONE_HREF, e(BIZ["phone"]),
                      ba_block("dining-before.jpg", "dining-after.jpg", "dining room wallpaper"))
 
-    lead_services = ["wallpaper-installation", "interior-painting", "wallpaper-removal",
-                     "commercial-painting", "trim-and-molding", "cabinet-painting"]
+    # Alternating so neither trade reads as the afterthought.
+    lead_services = ["interior-painting", "wallpaper-installation", "exterior-painting",
+                     "wallpaper-removal", "cabinet-painting", "commercial-painting"]
     cards = "".join(service_card(SERVICE_BY_SLUG[slug]) for slug in lead_services)
 
     promises = "".join("<li>%s</li>" % e(p) for p in claim_list())
@@ -953,12 +961,36 @@ def page_home():
 
 <section class="section">
   <div class="wrap">
+    <div class="feature feature--flip">
+      <div class="feature__media">
+        <img src="/assets/img/accent-wall.jpg" alt="Bedroom accent wall before and after, repainted in deep charcoal" loading="lazy" width="1000" height="750">
+      </div>
+      <div>
+        <p class="eyebrow">Painting</p>
+        <h2>The finish is decided in the hour before the paint</h2>
+        <p>Nail pops and cracks filled, split caulk lines cut out and replaced, glossy and
+           patched areas spot-primed so nothing flashes through the topcoat. Walls, ceilings,
+           trim, doors, cabinets and exteriors — a room at a time or the whole house.</p>
+        <p>Floors covered, furniture moved and wrapped, edges cut by hand, and the room
+           cleaned up at the end of each day rather than staged for tomorrow. That matters
+           when it is a room you still have to live in.</p>
+        <div class="btn-row">
+          <a class="btn btn--primary" href="/interior-painting/">Painting services</a>
+          <a class="btn btn--outline" href="/contact/">Get a free estimate</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
     <div class="feature">
       <div class="feature__media">
         <img src="/assets/img/closet-watercolor.jpg" alt="Watercolour and gold-leaf wallpaper on a closet wall and ceiling" loading="lazy" width="1000" height="750">
       </div>
       <div>
-        <p class="eyebrow">What sets us apart</p>
+        <p class="eyebrow">Wallpaper</p>
         <h2>Wallpaper is a different trade — we treat it like one</h2>
         <p>Hanging paper well is not painting with extra steps. The repeat has to be planned
            before the first drop goes up, the wall has to be flat and primed, and every seam
