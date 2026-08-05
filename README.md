@@ -90,6 +90,30 @@ REVIEWS = [
 
 ---
 
+## Showing the site to someone before it is live
+
+Every internal link in the live build is absolute (`/about/`, `/assets/...`). That is correct
+at a domain root and broken everywhere else, so there is a preview mode:
+
+```bash
+python3 build.py --preview                       # for zipping and opening off disk
+python3 build.py --preview proman-painting-site  # for a GitHub project page
+```
+
+Preview builds rewrite the links, add `noindex`, serve a `Disallow: /` robots.txt, and skip
+`CNAME` — so a preview can never get indexed or hijack the real domain.
+
+**Always re-run plain `python3 build.py` before deploying for real.**
+
+To send a copy someone can open by double-clicking:
+
+```bash
+python3 build.py --preview
+cd docs && zip -qr ../ProMan-site-preview.zip . -x '*.DS_Store'
+```
+
+They unzip it and open `index.html` — no server, no internet needed.
+
 ## Deploying to GitHub Pages
 
 The repo is already committed locally. It has **not** been pushed anywhere yet — creating the

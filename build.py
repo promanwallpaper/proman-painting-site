@@ -5,20 +5,35 @@ ProMan Painting & Wallpaper — static site generator.
 Everything the site says lives in this file. Edit the data at the top,
 run `python3 build.py`, and the whole site regenerates into docs/.
 
-    python3 build.py
+    python3 build.py                      # live build, served from the domain root
+    python3 build.py --preview REPO-NAME  # preview build for a GitHub project page
+    python3 build.py --preview            # preview build for opening files locally
 
 GitHub Pages then serves docs/ directly — no build step on GitHub's side.
+
+Preview mode exists because every internal link here is absolute (/about/,
+/assets/...). That is correct at a domain root, but wrong at
+account.github.io/repo-name/ and wrong again when a folder is opened straight
+off disk. Preview mode rewrites those links, adds noindex so a preview can
+never outrank the real site, and skips the CNAME file so GitHub does not
+redirect the preview to a domain that is not live yet.
 """
 
 import html
 import os
 import re
 import shutil
+import sys
 from datetime import date
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "docs")
 TODAY = date.today().isoformat()
+
+# Set by --preview. BASE_PATH is "/repo-name" for a project page, or "." for a
+# folder opened directly from disk.
+PREVIEW = False
+BASE_PATH = ""
 
 # ---------------------------------------------------------------------------
 # 1. BUSINESS FACTS
@@ -668,7 +683,7 @@ def layout(*, slug, title, desc, body, path, extra_schema="", hero=None):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>%(title)s</title>
 <meta name="description" content="%(desc)s">
-<link rel="canonical" href="%(canonical)s">
+%(robots)s<link rel="canonical" href="%(canonical)s">
 <meta property="og:type" content="website">
 <meta property="og:title" content="%(title)s">
 <meta property="og:description" content="%(desc)s">
@@ -770,6 +785,7 @@ def layout(*, slug, title, desc, body, path, extra_schema="", hero=None):
 </html>
 """ % {
         "title": e(title), "desc": e(desc), "canonical": canonical, "site": SITE_URL,
+        "robots": '<meta name="robots" content="noindex,nofollow">\n' if PREVIEW else "",
         "name": e(BIZ["name"]), "schema": schema, "nav": nav_html(slug),
         "tel": PHONE_HREF, "phone": e(BIZ["phone"]), "email": e(BIZ["email"]),
         "addr": e(addr_line), "hours": e(BIZ["hours"]),
@@ -862,8 +878,33 @@ def service_card(s, city=None):
     </article>""" % (media, e(title), e(s["card"]), s["slug"])
 
 
+def rebase(content, depth):
+    """Rewrite absolute internal links for a preview build.
+
+    depth is how many folders deep the page sits, so a page at /about/ can
+    reach the stylesheet at ../assets/css/style.css when the site is opened
+    straight off disk.
+    """
+    if not PREVIEW:
+        return content
+    prefix = ("../" * depth or "./") if BASE_PATH == "." else BASE_PATH + "/"
+
+    def sub(m):
+        attr, rest = m.group(1), m.group(2)
+        # a bare href="/" is the home page
+        if rest == "":
+            return '%s="%s"' % (attr, prefix + ("index.html" if BASE_PATH == "." else ""))
+        if BASE_PATH == "." and rest.endswith("/"):
+            rest += "index.html"
+        return '%s="%s"' % (attr, prefix + rest)
+
+    return re.sub(r'\b(href|src)="/([^"]*)"', sub, content)
+
+
 def write(path, content):
     full = os.path.join(OUT, path.lstrip("/"))
+    depth = path.strip("/").count("/")
+    content = rebase(content, depth)
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, "w", encoding="utf-8") as f:
         f.write(content)
@@ -1580,10 +1621,16 @@ def main():
         write("%s/index.html" % c["slug"], page_city(c))
 
     write("sitemap.xml", sitemap())
-    write("robots.txt", robots())
     write("llms.txt", llms_txt())
-    write("CNAME", BIZ["domain"] + "\n")
     write(".nojekyll", "")
+
+    if PREVIEW:
+        # keep a preview out of Google entirely, and do not let GitHub redirect
+        # it to a domain that is not pointing anywhere yet
+        write("robots.txt", "User-agent: *\nDisallow: /\n")
+    else:
+        write("robots.txt", robots())
+        write("CNAME", BIZ["domain"] + "\n")
 
     shutil.copytree(os.path.join(ROOT, "assets", "css"),
                     os.path.join(OUT, "assets", "css"))
@@ -1594,6 +1641,10 @@ def main():
 
     pages = 7 + len(SERVICES) + len(CITIES)
     print("Built %d pages into %s" % (pages, OUT))
+    if PREVIEW:
+        where = "opened directly from disk" if BASE_PATH == "." else BASE_PATH + "/"
+        print("  → PREVIEW build for %s — noindex, no CNAME." % where)
+        print("     Re-run plain `python3 build.py` before going live.")
     if BIZ["phone"].endswith("000-0000"):
         print("  ⚠️  Phone number is still a placeholder — set BIZ['phone'].")
     if not FORM_ENDPOINT:
@@ -1602,5 +1653,15 @@ def main():
         print("  ⚠️  No review text yet — /reviews/ links out instead of quoting.")
 
 
+def parse_args(argv):
+    global PREVIEW, BASE_PATH
+    if "--preview" in argv:
+        PREVIEW = True
+        i = argv.index("--preview")
+        rest = argv[i + 1:]
+        BASE_PATH = "/" + rest[0].strip("/") if rest else "."
+
+
 if __name__ == "__main__":
+    parse_args(sys.argv[1:])
     main()
