@@ -121,7 +121,10 @@ GitHub account and repo has to be done by you, from the browser.
 
 **1. Decide who owns it.** Roman's own GitHub account is the cleaner option — the site is his
 asset and handover later is trivial. (The Viking site sits under `vikingdoorservice-ctrl`,
-so a matching `promanpainting` account would be consistent.)
+so a separate account for ProMan would be consistent.)
+
+The domain is **paintingwallpapers.com**, confirmed 4 Aug 2026. It is written into
+`docs/CNAME` on every live build, so the repo already tells GitHub which domain to expect.
 
 **2. Create an empty repo** at <https://github.com/new> — name it `proman-painting-site`,
 public, and do **not** add a README, .gitignore or licence (this repo already has them).
@@ -138,8 +141,7 @@ git push -u origin main
 **4. Turn on Pages:** repo → *Settings* → *Pages* → Source: **Deploy from a branch** →
 Branch: `main`, Folder: **`/docs`** → Save. First deploy takes a couple of minutes.
 
-**5. Point the domain.** `docs/CNAME` is generated from `BIZ["domain"]`, so the repo already
-tells GitHub which domain to expect. At the registrar, add:
+**5. Point the domain.** At the registrar for **paintingwallpapers.com**, add:
 
 | Type | Name | Value |
 |---|---|---|
