@@ -26,6 +26,13 @@ import shutil
 import sys
 from datetime import date
 
+# Windows consoles default to a legacy codepage (cp1251 on a Russian system),
+# which cannot encode the ⚠️ in the warnings at the end of main(). The site is
+# already written by then, so the build was correct but still exited 1.
+for _stream in (sys.stdout, sys.stderr):
+    if hasattr(_stream, "reconfigure"):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "docs")
 TODAY = date.today().isoformat()
