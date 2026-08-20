@@ -96,7 +96,29 @@ CLAIMS = {
 # Until then the form falls back to a plain mailto: so it still works.
 FORM_ENDPOINT = ""  # e.g. "https://formspree.io/f/xyzabcde"
 
+# WebGL background (Three.js r185, vendored under assets/vendor/three).
+# "home" = home page only, "all" = every page, None = off and not even copied.
+# The scripts themselves also stand down on small screens, on
+# prefers-reduced-motion and where WebGL is missing, so this only decides
+# where they are loaded at all.
+SCENE_3D = "home"
+
 SITE_URL = "https://" + BIZ["domain"]
+
+# Bare "three" and "three/addons/" only resolve because of this map, which has
+# to be in the document before any module that imports them. Paths are written
+# from the domain root; rebase() rewrites them for preview builds.
+IMPORT_MAP = """<script type="importmap">
+{"imports":{
+  "three": "/assets/vendor/three/three.module.min.js",
+  "three/addons/": "/assets/vendor/three/addons/"
+}}
+</script>
+"""
+
+SCENE_TAGS = """<canvas id="bg-canvas" aria-hidden="true"></canvas>
+<script type="module" src="/assets/js/scene.js"></script>
+"""
 
 PHONE_HREF = "tel:+1" + re.sub(r"\D", "", BIZ["phone"])
 
@@ -666,6 +688,13 @@ def _json(d):
     return "{" + inner + "}"
 
 
+def _scene_on(slug):
+    """Does this page carry the WebGL background?"""
+    if not SCENE_3D:
+        return False
+    return SCENE_3D == "all" or slug == "home"
+
+
 def layout(*, slug, title, desc, body, path, extra_schema="", hero=None):
     """Wrap page body in the shared shell."""
     canonical = SITE_URL + path
@@ -709,7 +738,7 @@ def layout(*, slug, title, desc, body, path, extra_schema="", hero=None):
 <link rel="icon" href="/assets/img/logo.png">
 <link rel="apple-touch-icon" href="/assets/img/logo.png">
 <link rel="stylesheet" href="/assets/css/style.css">
-<script type="application/ld+json">%(schema)s</script>
+%(scene_head)s<script type="application/ld+json">%(schema)s</script>
 </head>
 <body>
 
@@ -795,7 +824,8 @@ def layout(*, slug, title, desc, body, path, extra_schema="", hero=None):
 </div>
 
 <script src="/assets/js/main.js" defer></script>
-</body>
+<script src="/assets/js/motion.js" defer></script>
+%(scene_body)s</body>
 </html>
 """ % {
         "title": e(title), "desc": e(desc), "canonical": canonical, "site": SITE_URL,
@@ -804,6 +834,8 @@ def layout(*, slug, title, desc, body, path, extra_schema="", hero=None):
         "tel": PHONE_HREF, "phone": e(BIZ["phone"]), "email": e(BIZ["email"]),
         "addr": e(addr_line), "hours": e(BIZ["hours"]),
         "hero": hero or "", "body": body,
+        "scene_head": IMPORT_MAP if _scene_on(slug) else "",
+        "scene_body": SCENE_TAGS if _scene_on(slug) else "",
         "svc_links": svc_links, "city_links": city_links,
         "social": "".join("<li>%s</li>" % s for s in social),
         "rating": "4.9", "total": PROOF["total_reviews"],
@@ -912,7 +944,14 @@ def rebase(content, depth):
             rest += "index.html"
         return '%s="%s"' % (attr, prefix + rest)
 
-    return re.sub(r'\b(href|src)="/([^"]*)"', sub, content)
+    content = re.sub(r'\b(href|src)="/([^"]*)"', sub, content)
+
+    # The import map is JSON inside a <script>, not an href/src attribute, so
+    # the rule above never reaches it. Its values are the only bare
+    # "/assets/vendor/..." strings any page emits, which makes this second
+    # pass unambiguous.
+    return re.sub(r'"/(assets/vendor/[^"]*)"',
+                  lambda m: '"%s"' % (prefix + m.group(1)), content)
 
 
 def write(path, content):
@@ -1675,6 +1714,9 @@ def main():
                     os.path.join(OUT, "assets", "css"))
     shutil.copytree(os.path.join(ROOT, "assets", "js"),
                     os.path.join(OUT, "assets", "js"))
+    if SCENE_3D:
+        shutil.copytree(os.path.join(ROOT, "assets", "vendor"),
+                        os.path.join(OUT, "assets", "vendor"))
     shutil.copytree(os.path.join(ROOT, "photos"),
                     os.path.join(OUT, "assets", "img"))
 
