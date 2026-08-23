@@ -87,7 +87,7 @@ PROOF["total_reviews"] = PROOF["google_count"] + PROOF["thumbtack_count"]
 CLAIMS = {
     "insured": False,     # general liability policy in hand?
     "licensed": False,    # SC license?
-    "years": None,        # int — years in business
+    "years": 22,          # confirmed by Roman, Aug 2026 — in business since 2004
     "warranty": None,     # str — e.g. "2-year workmanship warranty"
     "projects": None,     # int — completed projects
 }
