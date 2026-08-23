@@ -115,7 +115,13 @@
 
   if (finePointer) {
     document.querySelectorAll(".btn").forEach(magnetic);
-    document.querySelectorAll(".card, .feature__media").forEach(tilt);
+    document.querySelectorAll(".card, .feature__media").forEach(function (el) {
+      /* A before/after slider needs a steady frame: if the card tilts while
+         you drag, the handle slides out from under the cursor. Anything
+         holding one keeps its own plane. */
+      if (el.querySelector(".ba")) return;
+      tilt(el);
+    });
   }
 
   /* parallax ---------------------------------------------------------

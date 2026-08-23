@@ -61,11 +61,11 @@ BIZ = {
     "state": "SC",
     "zip": "29365",
     "hours": "Open 24 hours",
-    "gbp_url": "https://maps.app.goo.gl/",       # TODO: real Google Maps link
-    "gbp_review_url": "https://g.page/r/",       # TODO: "leave a review" short link
+    "gbp_url": "https://g.page/r/CXZT08lmppSBEBM",          # short link from the profile
+    "gbp_review_url": "https://g.page/r/CXZT08lmppSBEBM/review",
     "thumbtack_url": "https://www.thumbtack.com/sc/lyman/",  # TODO: real profile URL
     "facebook_url": "https://www.facebook.com/profile.php?id=61561333509474",
-    "instagram_url": "",                         # TODO
+    "instagram_url": "https://www.instagram.com/promanpaintingandwallpaper/",
 }
 
 # Lyman is a home base, not a storefront. Service-area businesses should not
@@ -121,6 +121,7 @@ SCENE_TAGS = """<canvas id="bg-canvas" aria-hidden="true"></canvas>
 """
 
 PHONE_HREF = "tel:+1" + re.sub(r"\D", "", BIZ["phone"])
+SMS_HREF   = "sms:+1" + re.sub(r"\D", "", BIZ["phone"])
 
 # ---------------------------------------------------------------------------
 # 2. SERVICES
@@ -547,6 +548,12 @@ GALLERY = [
     ("bath-lemon.jpg", "Bathroom — botanical paper above painted wainscoting"),
     ("accent-wall.jpg", "Bedroom — charcoal accent wall"),
     ("bath-collage.jpg", "Bathrooms — papered ceiling and floral powder room"),
+    ("mural-cinque-terre.jpg", "Living room — six-panel Cinque Terre photo mural above wainscot"),
+    ("bedroom-papered-ceiling.jpg", "Bedroom — patterned paper taken across the ceiling"),
+    ("living-woodland.jpg", "Living room — woodland feature wall, cut in around the window"),
+    ("powder-coral-chinoiserie.jpg", "Powder room — coral chinoiserie wrapped around all four walls"),
+    ("bath-ceiling-watercolour.jpg", "Bathroom — watercolour mural papered across the ceiling"),
+    ("dining-trellis.jpg", "Dining room — trellis paper above existing green wainscot"),
 ]
 
 # Clean before/after pairs, used for the sliders.
@@ -1469,11 +1476,14 @@ def page_contact():
         form_attrs = 'action="%s" method="POST"' % FORM_ENDPOINT
         note = ("We usually reply the same day. If it is urgent, calling is faster.")
     else:
-        # No form backend configured yet — fall back to the mail client so the
-        # form still does something rather than silently failing.
-        form_attrs = 'action="mailto:%s" method="POST" enctype="text/plain"' % BIZ["email"]
-        note = ("This form currently opens your email app. Calling is faster — "
-                "or email us directly at %s." % BIZ["email"])
+        # No form backend yet. Browsers silently drop a mailto: form POST, so
+        # main.js intercepts the submit and composes a real mailto: link with
+        # every field filled in. The action stays as a no-JS fallback.
+        form_attrs = ('action="mailto:%s" method="POST" enctype="text/plain" '
+                      'data-mailto="%s"' % (BIZ["email"], BIZ["email"]))
+        note = ("Sending opens your email app with the details already filled in. "
+                "Rather not? Text or call %s — that reaches us fastest."
+                % BIZ["phone"])
 
     head = """<section class="pagehead">
       <div class="wrap">
@@ -1523,6 +1533,10 @@ def page_contact():
         <p style="font-size:1.9rem;font-weight:900;margin:.2em 0">
           <a href="%(tel)s" style="color:var(--ink);text-decoration:none">%(phone)s</a>
         </p>
+        <p style="margin:.8em 0 0;display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn btn--primary" href="%(tel)s">Call now</a>
+          <a class="btn btn--outline" href="%(sms)s">Text us</a>
+        </p>
         <ul class="checks" style="margin-top:26px">
           <li>Free written estimates</li>
           <li>Serving Greenville, Spartanburg &amp; the Upstate</li>
@@ -1540,7 +1554,7 @@ def page_contact():
   </div>
 </section>
 """ % {"attrs": form_attrs, "svc": svc_opts, "cities": city_opts, "note": e(note),
-       "tel": PHONE_HREF, "phone": e(BIZ["phone"]), "hours": e(BIZ["hours"]),
+       "tel": PHONE_HREF, "sms": SMS_HREF, "phone": e(BIZ["phone"]), "hours": e(BIZ["hours"]),
        "city": e(BIZ["city"]), "state": e(BIZ["state"]), "zip": e(BIZ["zip"]),
        "gbp": BIZ["gbp_url"], "tt": BIZ["thumbtack_url"], "fb": BIZ["facebook_url"]}
 
@@ -1729,7 +1743,7 @@ def main():
     if BIZ["phone"].endswith("000-0000"):
         print("  ⚠️  Phone number is still a placeholder — set BIZ['phone'].")
     if not FORM_ENDPOINT:
-        print("  ⚠️  No form endpoint — the contact form falls back to mailto:.")
+        print("  ⚠️  No form endpoint — the contact form opens the visitor's mail app.")
     if not REVIEWS:
         print("  ⚠️  No review text yet — /reviews/ links out instead of quoting.")
 

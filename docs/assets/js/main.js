@@ -52,4 +52,30 @@
     range.addEventListener("input", set);
     set();
   });
+
+  /* estimate form with no backend yet — a mailto: POST goes nowhere in most
+     browsers, so build the mailto: link ourselves and let the mail app open */
+  var estimate = document.querySelector("form.form[data-mailto]");
+  if (estimate) {
+    estimate.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var val = function (n) {
+        var el = estimate.querySelector('[name="' + n + '"]');
+        return el ? el.value.trim() : "";
+      };
+      var body = [
+        "Name: " + val("name"),
+        "Phone: " + val("phone"),
+        "Email: " + val("email"),
+        "Service: " + val("service"),
+        "Town: " + val("city"),
+        "",
+        val("message")
+      ].join(String.fromCharCode(10));
+      var subject = "Estimate request" + (val("service") ? " — " + val("service") : "");
+      window.location.href = "mailto:" + estimate.getAttribute("data-mailto") +
+        "?subject=" + encodeURIComponent(subject) +
+        "&body=" + encodeURIComponent(body);
+    });
+  }
 })();
