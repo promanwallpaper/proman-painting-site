@@ -558,8 +558,12 @@ GALLERY = [
 
 # Clean before/after pairs, used for the sliders.
 PAIRS = [
-    ("dining-before.jpg", "dining-after.jpg", "Dining room, Upstate SC",
-     "Board-and-batten panelling installed, then dark botanical paper hung above it."),
+    ("bath-pebble-before.jpg", "bath-pebble-after.jpg", "Bathroom, Upstate SC",
+     "Flat painted walls papered in a soft pebble print, cut in tight to the tile "
+     "surround and around every fixture."),
+    ("bath-ceiling-before.jpg", "bath-ceiling-after.jpg", "Bathroom ceiling, Upstate SC",
+     "A bare white ceiling papered in a watercolour mural, cut around the downlight "
+     "and the extractor grille."),
     ("rose-before.jpg", "rose-after.jpg", "Bedroom feature panel",
      "An empty molding surround turned into a framed rose mural, seams cut tight to the frame."),
     ("office-before.jpg", "office-after.jpg", "Keller Williams office, Upstate SC",
@@ -992,7 +996,8 @@ def page_home():
         <div>%s</div>
       </div>
     </section>""" % (PROOF["total_reviews"], rating_items(), PHONE_HREF, e(BIZ["phone"]),
-                     ba_block("dining-before.jpg", "dining-after.jpg", "dining room wallpaper"))
+                     ba_block("bath-pebble-before.jpg", "bath-pebble-after.jpg",
+                              "bathroom wallpaper"))
 
     # Alternating so neither trade reads as the afterthought.
     lead_services = ["interior-painting", "wallpaper-installation", "exterior-painting",
