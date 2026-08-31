@@ -554,6 +554,7 @@ GALLERY = [
     ("powder-coral-chinoiserie.jpg", "Powder room — coral chinoiserie wrapped around all four walls"),
     ("bath-ceiling-watercolour.jpg", "Bathroom — watercolour mural papered across the ceiling"),
     ("dining-trellis.jpg", "Dining room — trellis paper above existing green wainscot"),
+    ("bedroom-woodland.jpg", "Bedroom — dark woodland paper with foxes, hung around the window"),
 ]
 
 # Clean before/after pairs, used for the sliders.
