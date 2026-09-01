@@ -555,6 +555,7 @@ GALLERY = [
     ("bath-ceiling-watercolour.jpg", "Bathroom — watercolour mural papered across the ceiling"),
     ("dining-trellis.jpg", "Dining room — trellis paper above existing green wainscot"),
     ("bedroom-woodland.jpg", "Bedroom — dark woodland paper with foxes, hung around the window"),
+    ("powder-toile.jpg", "Powder room — toile de Jouy, pattern matched around every corner"),
 ]
 
 # Clean before/after pairs, used for the sliders.
