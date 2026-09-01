@@ -697,7 +697,8 @@ p { margin: 0 0 1.1em; }
 
   .mobile-bar {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* Call and Text are one word each, the estimate button is three */
+    grid-template-columns: 1fr 1fr 1.4fr;
     position: fixed;
     left: 0; right: 0; bottom: 0;
     z-index: 80;
@@ -712,6 +713,7 @@ p { margin: 0 0 1.1em; }
     color: #fff;
   }
   .mobile-bar .m-call { background: var(--orange); }
+  .mobile-bar .m-text { background: var(--ink-deep); }
   .mobile-bar .m-quote { background: var(--ink); }
   body { padding-bottom: 56px; }
 }
@@ -788,3 +790,29 @@ p { margin: 0 0 1.1em; }
   color: var(--muted);
 }
 .clip video:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+
+/* ── estimate form result ──────────────────────────────────────────────
+   Shown after the form is submitted. The message is repeated here because
+   sms: links fail silently on desktops with nothing registered for them,
+   and a button that appears to do nothing is worse than no button. */
+
+.sent {
+  margin-top: 22px;
+  padding: 22px 24px;
+  background: var(--paper);
+  border-left: 3px solid var(--green);
+  border-radius: var(--radius);
+}
+.sent h3 { margin: 0 0 .4em; }
+.sent p { margin: 0 0 1em; color: var(--muted); }
+.sent__text {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: .95rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 14px 16px;
+  margin: 0 0 14px;
+}

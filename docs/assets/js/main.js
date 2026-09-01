@@ -53,29 +53,71 @@
     set();
   });
 
-  /* estimate form with no backend yet — a mailto: POST goes nowhere in most
-     browsers, so build the mailto: link ourselves and let the mail app open */
-  var estimate = document.querySelector("form.form[data-mailto]");
+  /* Estimate form. There is no backend to post to, so the details are handed
+     to the messaging app instead — every phone has one, and a text reaches a
+     contractor faster than email.
+
+     The catch with sms: is that a desktop with nothing registered for it does
+     nothing at all, silently, which is indistinguishable from a broken button.
+     So the composed message is also written onto the page afterwards, next to
+     the number, with a button to copy it. Whatever the device did, the visitor
+     ends up holding their message and knowing where to send it. */
+  var estimate = document.querySelector("form.form[data-sms]");
   if (estimate) {
     estimate.addEventListener("submit", function (ev) {
       ev.preventDefault();
+
       var val = function (n) {
         var el = estimate.querySelector('[name="' + n + '"]');
         return el ? el.value.trim() : "";
       };
-      var body = [
-        "Name: " + val("name"),
-        "Phone: " + val("phone"),
-        "Email: " + val("email"),
-        "Service: " + val("service"),
-        "Town: " + val("city"),
-        "",
-        val("message")
-      ].join(String.fromCharCode(10));
-      var subject = "Estimate request" + (val("service") ? " — " + val("service") : "");
-      window.location.href = "mailto:" + estimate.getAttribute("data-mailto") +
-        "?subject=" + encodeURIComponent(subject) +
-        "&body=" + encodeURIComponent(body);
+      var nl = String.fromCharCode(10);
+
+      var lines = ["Estimate request"];
+      var add = function (label, v) { if (v) lines.push(label + ": " + v); };
+      add("Name", val("name"));
+      add("Phone", val("phone"));
+      add("Email", val("email"));
+      add("Service", val("service"));
+      add("Town", val("city"));
+      if (val("message")) { lines.push(""); lines.push(val("message")); }
+      var text = lines.join(nl);
+
+      /* "?&body=" rather than "?body=" — iOS wanted the ampersand for years
+         and both platforms accept this form. */
+      var number = estimate.getAttribute("data-sms");
+      window.location.href = number + "?&body=" + encodeURIComponent(text);
+
+      var done = estimate.parentNode.querySelector(".sent");
+      if (!done) {
+        done = document.createElement("div");
+        done.className = "sent";
+        estimate.parentNode.insertBefore(done, estimate.nextSibling);
+      }
+      done.innerHTML =
+        '<h3>Your message is ready</h3>' +
+        '<p>Your texting app should have opened with this in it — press send ' +
+        'there and it reaches us. If nothing opened, copy it below and text or ' +
+        'call <a href="' + number.replace("sms:", "tel:") + '">' +
+        (document.querySelector(".header__phone") ?
+          document.querySelector(".header__phone").textContent.trim() :
+          number.replace("sms:", "")) + '</a>.</p>' +
+        '<pre class="sent__text"></pre>' +
+        '<button type="button" class="btn btn--dark sent__copy">Copy the message</button>';
+      done.querySelector(".sent__text").textContent = text;
+
+      done.querySelector(".sent__copy").addEventListener("click", function () {
+        var btn = this;
+        var finish = function (ok) { btn.textContent = ok ? "Copied" : "Select and copy above"; };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { finish(true); },
+                                                   function () { finish(false); });
+        } else {
+          finish(false);
+        }
+      });
+
+      done.scrollIntoView({ behavior: "smooth", block: "center" });
     });
   }
 })();

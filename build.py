@@ -863,7 +863,8 @@ def layout(*, slug, title, desc, body, path, extra_schema="", hero=None):
 </footer>
 
 <div class="mobile-bar">
-  <a class="m-call" href="%(tel)s">Call now</a>
+  <a class="m-call" href="%(tel)s">Call</a>
+  <a class="m-text" href="%(sms)s">Text</a>
   <a class="m-quote" href="/contact/">Free estimate</a>
 </div>
 
@@ -875,7 +876,8 @@ def layout(*, slug, title, desc, body, path, extra_schema="", hero=None):
         "title": e(title), "desc": e(desc), "canonical": canonical, "site": SITE_URL,
         "robots": '<meta name="robots" content="noindex,nofollow">\n' if PREVIEW else "",
         "name": e(BIZ["name"]), "schema": schema, "nav": nav_html(slug),
-        "tel": PHONE_HREF, "phone": e(BIZ["phone"]), "email": e(BIZ["email"]),
+        "tel": PHONE_HREF, "sms": SMS_HREF, "phone": e(BIZ["phone"]),
+        "email": e(BIZ["email"]),
         "addr": e(addr_line), "hours": e(BIZ["hours"]),
         "hero": hero or "", "body": body,
         "scene_head": IMPORT_MAP if _scene_on(slug) else "",
@@ -1036,11 +1038,13 @@ def page_home():
           <div class="btn-row">
             <a class="btn btn--primary" href="/contact/">Get a free estimate</a>
             <a class="btn btn--ghost" href="%s">Call %s</a>
+            <a class="btn btn--ghost" href="%s">Text us</a>
           </div>
         </div>
         <div>%s</div>
       </div>
     </section>""" % (PROOF["total_reviews"], rating_items(), PHONE_HREF, e(BIZ["phone"]),
+                     SMS_HREF,
                      ba_block("guest-bath-before.jpg", "guest-bath-after.jpg",
                               "guest bathroom wallpaper"))
 
@@ -1216,9 +1220,11 @@ def page_service(s):
         <div class="btn-row" style="margin-top:26px">
           <a class="btn btn--primary" href="/contact/">Free estimate</a>
           <a class="btn btn--ghost" href="%s">Call %s</a>
+          <a class="btn btn--ghost" href="%s">Text us</a>
         </div>
       </div>
-    </section>""" % (e(s["nav"]), e(s["h1"]), e(s["intro"]), PHONE_HREF, e(BIZ["phone"]))
+    </section>""" % (e(s["nav"]), e(s["h1"]), e(s["intro"]), PHONE_HREF, e(BIZ["phone"]),
+                     SMS_HREF)
 
     body = """
 %(trust)s
@@ -1282,9 +1288,11 @@ def page_city(c):
         <div class="btn-row" style="margin-top:26px">
           <a class="btn btn--primary" href="/contact/">Free estimate</a>
           <a class="btn btn--ghost" href="%s">Call %s</a>
+          <a class="btn btn--ghost" href="%s">Text us</a>
         </div>
       </div>
-    </section>""" % (e(c["name"]), e(c["name"]), e(c["blurb"]), PHONE_HREF, e(BIZ["phone"]))
+    </section>""" % (e(c["name"]), e(c["name"]), e(c["blurb"]), PHONE_HREF, e(BIZ["phone"]),
+                     SMS_HREF)
 
     body = """
 %(trust)s
@@ -1543,11 +1551,14 @@ def page_contact():
         # No form backend yet. Browsers silently drop a mailto: form POST, so
         # main.js intercepts the submit and composes a real mailto: link with
         # every field filled in. The action stays as a no-JS fallback.
-        form_attrs = ('action="mailto:%s" method="POST" enctype="text/plain" '
-                      'data-mailto="%s"' % (BIZ["email"], BIZ["email"]))
-        note = ("Sending opens your email app with the details already filled in. "
-                "Rather not? Text or call %s — that reaches us fastest."
-                % BIZ["phone"])
+        # No backend, so the browser cannot post this anywhere. Hand the
+        # details to the messaging app instead — every phone has one, and a
+        # text reaches us faster than email does either way. The action is a
+        # no-JS fallback; main.js builds the real link with the fields in it.
+        form_attrs = ('action="%s" method="GET" data-sms="%s"'
+                      % (SMS_HREF, SMS_HREF))
+        note = ("Sending opens your texting app with the details already filled in — "
+                "you still press send. Prefer to talk? Call %s." % BIZ["phone"])
 
     head = """<section class="pagehead">
       <div class="wrap">
@@ -1809,7 +1820,7 @@ def main():
     if BIZ["phone"].endswith("000-0000"):
         print("  ⚠️  Phone number is still a placeholder — set BIZ['phone'].")
     if not FORM_ENDPOINT:
-        print("  ⚠️  No form endpoint — the contact form opens the visitor's mail app.")
+        print("  ⚠️  No form endpoint — the contact form hands the details to the visitor's texting app instead.")
     if not REVIEWS:
         print("  ⚠️  No review text yet — /reviews/ links out instead of quoting.")
 
