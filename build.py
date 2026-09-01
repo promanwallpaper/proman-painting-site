@@ -63,9 +63,11 @@ BIZ = {
     "hours": "Open 24 hours",
     "gbp_url": "https://g.page/r/CXZT08lmppSBEBM",          # short link from the profile
     "gbp_review_url": "https://g.page/r/CXZT08lmppSBEBM/review",
-    "thumbtack_url": "https://www.thumbtack.com/sc/lyman/",  # TODO: real profile URL
+    "thumbtack_url": "https://www.thumbtack.com/sc/lyman/handyman/proman-painting-wallpapers/service/481005582051098641",
     "facebook_url": "https://www.facebook.com/profile.php?id=61561333509474",
     "instagram_url": "https://www.instagram.com/promanpaintingandwallpaper/",
+    "youtube_url": "https://www.youtube.com/@ProManPaintingWallpaper",
+    "tiktok_url": "https://www.tiktok.com/@proman_paintingwallpaper",
 }
 
 # Lyman is a home base, not a storefront. Service-area businesses should not
@@ -76,9 +78,9 @@ SHOW_STREET = False
 # Verified social proof. These are the ONLY numbers the site is allowed to use.
 PROOF = {
     "google_rating": "5.0",
-    "google_count": 28,
+    "google_count": 29,
     "thumbtack_rating": "4.9",
-    "thumbtack_count": 83,
+    "thumbtack_count": 86,
 }
 PROOF["total_reviews"] = PROOF["google_count"] + PROOF["thumbtack_count"]
 
@@ -708,7 +710,9 @@ def schema_localbusiness():
         '"dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],'
         '"opens":"00:00","closes":"23:59"}',
     ]
-    sameas = [u for u in (BIZ["facebook_url"], BIZ["instagram_url"], BIZ["thumbtack_url"]) if u]
+    sameas = [u for u in (BIZ["facebook_url"], BIZ["instagram_url"],
+                          BIZ["thumbtack_url"], BIZ["youtube_url"],
+                          BIZ["tiktok_url"], BIZ["gbp_url"]) if u]
     if sameas:
         parts.append('"sameAs":[%s]' % ",".join('"%s"' % u for u in sameas))
     return "{" + ",".join(parts) + "}"
@@ -746,6 +750,10 @@ def layout(*, slug, title, desc, body, path, extra_schema="", hero=None):
         social.append('<a href="%s" rel="noopener">Instagram</a>' % BIZ["instagram_url"])
     if BIZ["thumbtack_url"]:
         social.append('<a href="%s" rel="noopener">Thumbtack</a>' % BIZ["thumbtack_url"])
+    if BIZ["youtube_url"]:
+        social.append('<a href="%s" rel="noopener">YouTube</a>' % BIZ["youtube_url"])
+    if BIZ["tiktok_url"]:
+        social.append('<a href="%s" rel="noopener">TikTok</a>' % BIZ["tiktok_url"])
 
     addr_line = "%s, %s %s" % (BIZ["city"], BIZ["state"], BIZ["zip"])
     if SHOW_STREET:
