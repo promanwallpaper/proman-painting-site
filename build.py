@@ -558,6 +558,10 @@ GALLERY = [
     ("dining-trellis.jpg", "Dining room — trellis paper above existing green wainscot"),
     ("bedroom-woodland.jpg", "Bedroom — dark woodland paper with foxes, hung around the window"),
     ("powder-toile.jpg", "Powder room — toile de Jouy, pattern matched around every corner"),
+    ("bedroom-peony-mural.jpg", "Bedroom — oversized peony mural carried across two walls"),
+    ("powder-gold-green.jpg", "Powder room — gold geometric paper above deep green wainscot"),
+    ("breakfast-floral.jpg", "Breakfast room — small-scale floral hung around the windows"),
+    ("kids-geometric.jpg", "Kids' room — bold retro geometric feature wall"),
 ]
 
 # Clean before/after pairs, used for the sliders.
