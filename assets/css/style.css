@@ -760,3 +760,31 @@ p { margin: 0 0 1.1em; }
 @media (prefers-reduced-motion: reduce) {
   #bg-canvas { display: none; }
 }
+
+/* ── short clips ───────────────────────────────────────────────────────
+   Vertical 9:16, because that is how the footage was shot and how most
+   visitors hold their phone. The box is reserved by aspect-ratio so the
+   poster and the video occupy the same space and nothing shifts. */
+
+.clips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 22px;
+}
+.clip { margin: 0; }
+.clip video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: var(--ink);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.clip figcaption {
+  margin-top: 11px;
+  font-size: .93rem;
+  color: var(--muted);
+}
+.clip video:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }

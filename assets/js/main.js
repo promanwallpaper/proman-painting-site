@@ -79,3 +79,45 @@
     });
   }
 })();
+
+/* Short clips ---------------------------------------------------------
+   The markup ships preload="none", so nothing is fetched until one of
+   these scrolls into view. Playback stops again on the way out, which
+   keeps a phone from decoding four videos at once.
+
+   Reduced motion is honoured by not autoplaying at all; the clips get
+   native controls instead so they are still watchable on request. A
+   click toggles playback either way, which is also the pause mechanism
+   an auto-playing clip is required to offer. */
+(function () {
+  "use strict";
+
+  var clips = [].slice.call(document.querySelectorAll(".clip video"));
+  if (!clips.length) return;
+
+  var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (still || !("IntersectionObserver" in window)) {
+    clips.forEach(function (v) { v.setAttribute("controls", ""); });
+    return;
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      var v = entry.target;
+      if (entry.isIntersecting) {
+        if (!v.dataset.held) v.play().catch(function () {});
+      } else {
+        v.pause();
+      }
+    });
+  }, { threshold: 0.35 });
+
+  clips.forEach(function (v) {
+    io.observe(v);
+    v.addEventListener("click", function () {
+      if (v.paused) { delete v.dataset.held; v.play().catch(function () {}); }
+      else { v.dataset.held = "1"; v.pause(); }
+    });
+  });
+})();

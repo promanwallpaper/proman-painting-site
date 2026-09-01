@@ -559,7 +559,26 @@ GALLERY = [
 ]
 
 # Clean before/after pairs, used for the sliders.
+CLIPS = [
+    ("mural-step-by-step", "Hanging a mural, step by step"),
+    ("painting-step-by-step", "Cutting in an accent wall"),
+    ("coral-powder-reveal", "Powder room, before and after"),
+    ("stair-powder-reveal", "Under the stairs, before and after"),
+]
+
 PAIRS = [
+    ("guest-bath-before.jpg", "guest-bath-after.jpg", "Guest bathroom, Upstate SC",
+     "Flat painted walls papered in a dark botanical print, cut around the door "
+     "casing, the shelving and both sconces."),
+    ("coral-powder-before.jpg", "coral-powder-after.jpg", "Powder room, Upstate SC",
+     "A bare room wrapped in coral chinoiserie, hung around the chandelier before "
+     "the antique vanity went back in."),
+    ("stair-powder-before.jpg", "stair-powder-after.jpg", "Powder room under the stairs",
+     "A narrow alcove with a sloping ceiling, papered top to bottom with the pattern "
+     "carried through every angle."),
+    ("bedroom-charcoal-before.jpg", "bedroom-charcoal-after.jpg", "Bedroom accent wall",
+     "Patched and primed drywall painted deep charcoal, cut in by hand along the "
+     "ceiling line and around the window."),
     ("bath-pebble-before.jpg", "bath-pebble-after.jpg", "Bathroom, Upstate SC",
      "Flat painted walls papered in a soft pebble print, cut in tight to the tile "
      "surround and around every fixture."),
@@ -768,7 +787,7 @@ def layout(*, slug, title, desc, body, path, extra_schema="", hero=None):
 
 <header class="header">
   <div class="wrap header__inner">
-    <a class="logo" href="/"><img src="/assets/img/logo.png" alt="%(name)s" width="210" height="54"></a>
+    <a class="logo" href="/"><img src="/assets/img/logo.png" alt="%(name)s" width="74" height="74"></a>
     %(nav)s
     <div class="header__cta">
       <a class="header__phone" href="%(tel)s">%(phone)s</a>
@@ -799,7 +818,7 @@ def layout(*, slug, title, desc, body, path, extra_schema="", hero=None):
   <div class="wrap">
     <div class="footer__grid">
       <div>
-        <img class="footer__logo" src="/assets/img/logo.png" alt="%(name)s" width="200" height="52">
+        <img class="footer__logo" src="/assets/img/logo.png" alt="%(name)s" width="52" height="52">
         <p>Painting and wallpaper for Greenville, Spartanburg and the surrounding Upstate.
            Locally owned and operated.</p>
         <p><strong style="color:#fff">%(rating)s★</strong> average from %(total)d reviews
@@ -866,6 +885,18 @@ def ba_block(before, after, label=""):
       <input class="ba__range" type="range" min="0" max="100" value="50"
              aria-label="Drag to compare before and after">
     </div>""" % (before, e(label), after, e(label))
+
+
+def clip_block(name, label):
+    """One muted 9:16 clip. preload="none" keeps it off the wire until the
+    visitor scrolls down; main.js starts it only while it is on screen."""
+    return """<figure class="clip">
+      <video muted loop playsinline preload="none"
+             poster="/assets/video/%s.jpg" aria-label="%s">
+        <source src="/assets/video/%s.mp4" type="video/mp4">
+      </video>
+      <figcaption>%s</figcaption>
+    </figure>""" % (name, e(label), name, e(label))
 
 
 def rating_items():
@@ -998,8 +1029,8 @@ def page_home():
         <div>%s</div>
       </div>
     </section>""" % (PROOF["total_reviews"], rating_items(), PHONE_HREF, e(BIZ["phone"]),
-                     ba_block("bath-pebble-before.jpg", "bath-pebble-after.jpg",
-                              "bathroom wallpaper"))
+                     ba_block("guest-bath-before.jpg", "guest-bath-after.jpg",
+                              "guest bathroom wallpaper"))
 
     # Alternating so neither trade reads as the afterthought.
     lead_services = ["interior-painting", "wallpaper-installation", "exterior-painting",
@@ -1304,6 +1335,8 @@ def page_gallery():
         '<figcaption>%s</figcaption></figure>' % (f, e(cap), e(cap))
         for f, cap in GALLERY)
 
+    clips = "".join(clip_block(n, cap) for n, cap in CLIPS)
+
     pairs = ""
     for before, after, title, note in PAIRS:
         pairs += """<div>
@@ -1341,7 +1374,19 @@ def page_gallery():
     <div class="gallery">%s</div>
   </div>
 </section>
-""" % (pairs, figs)
+
+<section class="section">
+  <div class="wrap">
+    <div class="center" style="margin-bottom:40px">
+      <p class="eyebrow">In motion</p>
+      <h2>A few seconds on site</h2>
+      <p style="color:var(--muted);max-width:56ch;margin-inline:auto">Silent, and only
+         plays while it is on your screen.</p>
+    </div>
+    <div class="clips">%s</div>
+  </div>
+</section>
+""" % (pairs, figs, clips)
 
     return layout(slug="gallery",
                   title="Gallery — Wallpaper & Painting Projects | %s" % BIZ["name"],
@@ -1735,6 +1780,8 @@ def main():
                     os.path.join(OUT, "assets", "css"))
     shutil.copytree(os.path.join(ROOT, "assets", "js"),
                     os.path.join(OUT, "assets", "js"))
+    shutil.copytree(os.path.join(ROOT, "assets", "video"),
+                    os.path.join(OUT, "assets", "video"))
     if SCENE_3D:
         shutil.copytree(os.path.join(ROOT, "assets", "vendor"),
                         os.path.join(OUT, "assets", "vendor"))
