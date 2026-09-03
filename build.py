@@ -638,9 +638,13 @@ PAIRS = [
     ("stair-powder-before.jpg", "stair-powder-after.jpg", "Powder room under the stairs",
      "A narrow alcove with a sloping ceiling, papered top to bottom with the pattern "
      "carried through every angle."),
-    ("bedroom-charcoal-before.jpg", "bedroom-charcoal-after.jpg", "Bedroom accent wall",
-     "Patched and primed drywall painted deep charcoal, cut in by hand along the "
-     "ceiling line and around the window."),
+    # The charcoal bedroom is deliberately not here. Its "after" frame is a
+    # mid-job shot — only the narrow return by the window is painted and the
+    # main wall is still in filler. The finished wall exists only inside the
+    # accent-wall.jpg collage, and that shot was taken from further back, so
+    # cropping it to match the "before" leaves the headboard doubled across the
+    # wipe. It stays in GALLERY as a stacked before/after, which reads fine.
+    # To restore the slider: reshoot the finished wall from the "before" position.
     ("bath-pebble-before.jpg", "bath-pebble-after.jpg", "Bathroom, Upstate SC",
      "Flat painted walls papered in a soft pebble print, cut in tight to the tile "
      "surround and around every fixture."),
