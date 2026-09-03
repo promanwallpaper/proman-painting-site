@@ -491,8 +491,64 @@ CITY_BY_SLUG = {c["slug"]: c for c in CITIES}
 #    links out to the platforms instead of quoting anyone.
 # ---------------------------------------------------------------------------
 
+#    Transcribed from Roman's screenshots of the Google profile, 2 Sep 2026.
+#    Verbatim. Surnames cut to an initial; Ben's trailing "— Ben" signature dropped
+#    because the attribution line already carries it. Nothing else altered.
+#
+#    Held back on purpose:
+#      Vickie Johnson  — praises "WallpaperGuys", a different company name. Unresolved.
+#      lizzie thomas   — the screenshot truncates her text mid-sentence.
+
 REVIEWS = [
-    # {"text": "…", "who": "First name L.", "source": "Google", "stars": 5},
+    {"source": "Google", "stars": 5, "who": "Ben",
+     "text": "I recently hired Roman to install wallpaper in my bathroom, laundry room, and "
+             "bedroom and I couldn't be happier with the results. From the moment he arrived, "
+             "he was professional, punctual, and clearly knew his craft. He took the time to "
+             "prep the walls properly, measure everything with precision, and made sure the "
+             "pattern matched perfectly across seams—no bubbles, no wrinkles, just clean, "
+             "smooth walls that look amazing. He also kept the work area tidy and even cleaned "
+             "up after himself, which I really appreciated. What impressed me most was his "
+             "attention to detail and how he made sure I was happy with everything before "
+             "wrapping up. The room looks completely transformed thanks to his work. Highly "
+             "recommend if you're looking for someone skilled, reliable, and easy to work with!"},
+    {"source": "Google", "stars": 5, "who": "Christie C.",
+     "text": "Absolutely thrilled with the work from Roman! His attention to detail, "
+             "professionalism, and skill transformed my bathroom. The painting was flawless—"
+             "crisp lines and no mess left behind. The wallpaper installation was equally "
+             "impressive, with perfect alignment and seamless application, even in tricky "
+             "corners. He was punctual, communicative, and a pleasure to work with, ensuring "
+             "every step met my expectations. My space looks stunning, and I've received "
+             "endless compliments. Highly recommend his exceptional services for anyone "
+             "looking to elevate their home!"},
+    {"source": "Google", "stars": 5, "who": "Mooney Property Management",
+     "text": "Roman did a great job installing wallpaper in two rooms in our home. Both jobs "
+             "were rather challenging with one having wallpaper going all the way up the steps "
+             "to the second floor and the other, having wallpaper on the ceiling. Very "
+             "punctual, respectful and professional did a great job would hire again."},
+    {"source": "Google", "stars": 5, "who": "Samantha B.",
+     "text": "Roman did an excellent job on our entryway, and I'm so glad I found him! Not "
+             "only did he help me figure out how much wallpaper I needed to order but he also "
+             "helped me carry and hang this giant mirror in my hallway. He's a super nice guy "
+             "and I will definitely use him for any future wallpaper projects."},
+    {"source": "Google", "stars": 5, "who": "Natalie O.",
+     "text": "Absolutely amazing! Roman wallpaper in both our kids rooms when we purchased our "
+             "home. Roman is the absolute best!!!! I can't wait to hire again for more projects!!"},
+    {"source": "Google", "stars": 5, "who": "Carolyn J.",
+     "text": "Roman did excellent work. I didn't have to wait a long time for an appointment. "
+             "He arrived on time. He was very friendly and professional and very precise. I "
+             "love my new walls and have gotten lots of compliments on it. I highly recommend "
+             "this business."},
+    {"source": "Google", "stars": 5, "who": "Susan H.",
+     "text": "Roman did a fabulous job on our wallpaper. It looks fantastic! After he was "
+             "finished with it, he added an electrical outlet for us. A jack of all trades."},
+    {"source": "Google", "stars": 5, "who": "Elizabeth D.",
+     "text": "Roman is professional and did excellent wallpapering work. He is kind and "
+             "trustworthy with a good work ethic."},
+    {"source": "Google", "stars": 5, "who": "Jarrett S.",
+     "text": "We have hired Roman for a few of our projects. He was the best, truly. Very "
+             "polite and honest and communicative. The quality of his work is amazing. He is a "
+             "very skilled carpenter and we will surely use him again on future projects. I "
+             "would hire him again without question and you should too."},
 ]
 
 # ---------------------------------------------------------------------------
@@ -1416,6 +1472,27 @@ def page_gallery():
 
 
 def page_reviews():
+    # The link-out stays whether or not we are quoting. Quoted praise is only worth
+    # anything if the reader can go and check it against the source.
+    if REVIEWS:
+        blurb = ("These are quoted word for word. Every one of them is on our Google profile, "
+                 "where you can read it in full alongside the rest.")
+    else:
+        # No invented testimonials. Ratings are verified; the words are not ours to write.
+        blurb = ("Every review lives on Google and Thumbtack, where you can read it in full "
+                 "and check it is real.")
+
+    link_out = """<div class="review-cta">
+      <div>
+        <h3 style="margin-bottom:.3em">Read what customers actually wrote</h3>
+        <p style="margin:0;color:var(--muted)">%s</p>
+      </div>
+      <div class="btn-row" style="flex:0 0 auto">
+        <a class="btn btn--primary" href="%s" rel="noopener">Google reviews</a>
+        <a class="btn btn--outline" href="%s" rel="noopener">Thumbtack reviews</a>
+      </div>
+    </div>""" % (blurb, BIZ["gbp_url"], BIZ["thumbtack_url"])
+
     if REVIEWS:
         cards = "".join(
             '<div class="review"><div class="stars">%s</div><p>“%s”</p>'
@@ -1423,20 +1500,10 @@ def page_reviews():
             '<div class="review__src">via %s</div></div>'
             % ("★" * r.get("stars", 5), e(r["text"]), e(r["who"]), e(r["source"]))
             for r in REVIEWS)
-        quotes = '<div class="grid grid--3">%s</div>' % cards
+        quotes = ('<div class="grid grid--3">%s</div>'
+                  '<div style="margin-top:32px">%s</div>' % (cards, link_out))
     else:
-        # No invented testimonials. Ratings are verified; the words are not ours to write.
-        quotes = """<div class="review-cta">
-          <div>
-            <h3 style="margin-bottom:.3em">Read what customers actually wrote</h3>
-            <p style="margin:0;color:var(--muted)">Every review lives on Google and Thumbtack,
-               where you can read it in full and check it is real.</p>
-          </div>
-          <div class="btn-row" style="flex:0 0 auto">
-            <a class="btn btn--primary" href="%s" rel="noopener">Google reviews</a>
-            <a class="btn btn--outline" href="%s" rel="noopener">Thumbtack reviews</a>
-          </div>
-        </div>""" % (BIZ["gbp_url"], BIZ["thumbtack_url"])
+        quotes = link_out
 
     head = """<section class="pagehead">
       <div class="wrap">
